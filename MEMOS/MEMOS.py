@@ -203,7 +203,7 @@ class MEMOSLogic(ScriptedLoadableModuleLogic):
           ToTensord
 )
         # check configuration
-        monai.config.print_config()
+        print_config()
 
         # define pre transforms
         pre_transforms = Compose([
