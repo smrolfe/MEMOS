@@ -253,20 +253,18 @@ class MEMOSLogic(ScriptedLoadableModuleLogic):
             net.load_state_dict(torch.load(os.path.join(modelPath, "best_metric_model.pth")))
         net.eval()
 
-        filepath = files[0]
         with torch.no_grad():
-          # for d in dataloader:
-          #  image = d["image"].to(device)
-          image = pre_transforms(filepath)['image'].to(device)
-          output_raw = sliding_window_inference(
-            image, (96, 96, 96), 4, net, overlap=0.8)
-          output_formatted = torch.argmax(output_raw, dim=1).detach().cpu()[0, :, :, :]
-          outputFile = os.path.basename(filepath.get("image").split('.')[0]) + "_seg.nii.gz"
-          print(outputFile)
-          write_nifti(
-            data=output_formatted,
-            file_name=os.path.join(outputPath, outputFile)
-            )
+          for filepath in files:
+            image = pre_transforms(filepath)['image'].to(device)
+            output_raw = sliding_window_inference(
+              image, (96, 96, 96), 4, net, overlap=0.8)
+            output_formatted = torch.argmax(output_raw, dim=1).detach().cpu()[0, :, :, :]
+            outputFile = os.path.basename(filepath.get("image").split('.')[0]) + "_seg.nii.gz"
+            print("Writing: ", outputFile)
+            write_nifti(
+              data=output_formatted,
+              file_name=os.path.join(outputPath, outputFile)
+              )
 
 
 class MEMOSTest(ScriptedLoadableModuleTest):
